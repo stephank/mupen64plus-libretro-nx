@@ -869,8 +869,8 @@ public:
 			"uniform lowp int uScreenSpaceTriangle;	\n"
 			"highp vec2 texCoord0;					\n"
 			"highp vec2 texCoord1;					\n"
-			"highp vec2[5] tcData0;					\n"
-			"highp vec2[5] tcData1;					\n"
+			"highp vec2 tcData0[5];					\n"
+			"highp vec2 tcData1[5];					\n"
 		;
 
 		if (config.generalEmulation.enableLegacyBlending != 0) {
@@ -1082,9 +1082,9 @@ public:
 		m_part =
 			"highp vec2 clampWrapMirror(in highp vec2 vTexCoord,	\n"
 			"	in highp vec2 vWrap, in highp vec2 vClamp,			\n"
-			"	in lowp vec2 vClampEn, in lowp vec2 vMirrorEn );	\n"
-			"highp vec2[5] textureEngine0(in highp vec2 texCoord);	\n"
-			"highp vec2[5] textureEngine1(in highp vec2 texCoord);	\n"
+			"	in lowp vec2 vClampEn, in lowp vec2 vMirrorEn );		\n"
+			"void textureEngine0(in highp vec2 texCoord, out highp vec2 tcData[5]); \n"
+			"void textureEngine1(in highp vec2 texCoord, out highp vec2 tcData[5]); \n"
 			;
 	}
 };
@@ -1103,7 +1103,7 @@ public:
 			(g_cycleType == G_CYC_COPY || g_textureConvert.useTextureFiltering()))
 		{
 			shader <<
-				"lowp vec4 readTexMS(in lowp sampler2DMS mstex, in highp vec2[5] tcData, in lowp int fbMonochrome, in lowp int fbFixedAlpha);\n";
+				"lowp vec4 readTexMS(in lowp sampler2DMS mstex, in highp vec2 tcData[5], in lowp int fbMonochrome, in lowp int fbFixedAlpha);\n";
 		}
 	}
 
@@ -1338,7 +1338,7 @@ public:
 			if (g_textureConvert.useTextureFiltering()) {
 				shaderPart +=
 					"uniform lowp int uTextureFilterMode;								\n"
-					"lowp vec4 readTex(in sampler2D tex, in highp vec2[5] tcData, in lowp int fbMonochrome, in lowp int fbFixedAlpha);	\n"
+					"lowp vec4 readTex(in sampler2D tex, in highp vec2 tcData[5], in lowp int fbMonochrome, in lowp int fbFixedAlpha);	\n"
 					;
 			}
 			if (g_textureConvert.useYUVCoversion()) {
@@ -1346,7 +1346,7 @@ public:
 					"uniform lowp ivec2 uTextureFormat;									\n"
 					"uniform lowp int uTextureConvert;									\n"
 					"uniform mediump ivec4 uConvertParams;								\n"
-					"lowp vec4 YUV_Convert(in sampler2D tex, in highp vec2[5] tcData, in lowp int convert, in lowp int format, in lowp vec4 prev);	\n"
+					"lowp vec4 YUV_Convert(in sampler2D tex, in highp vec2 tcData[5], in lowp int convert, in lowp int format, in lowp vec4 prev);	\n"
 					;
 			}
 		}
@@ -1385,7 +1385,7 @@ public:
 				;
 		} else {
 			m_part =
-				"lowp vec4 readTex(in sampler2D tex, in highp vec2[5] tcData, in lowp int fbMonochrome, in lowp int fbFixedAlpha);	\n"
+				"lowp vec4 readTex(in sampler2D tex, in highp vec2 tcData[5], in lowp int fbMonochrome, in lowp int fbFixedAlpha);	\n"
 			;
 		}
 	}
@@ -1855,7 +1855,7 @@ public:
 	{
 		if (_glinfo.isGLES2) {
 			"uniform mediump vec2 uTextureSize[2];										\n"
-				"lowp vec4 TextureMipMap(in sampler2D tex, in highp vec2[5] tcData, in lowp float lod)	\n"
+				"lowp vec4 TextureMipMap(in sampler2D tex, in highp vec2 tcData[5], in lowp float lod)	\n"
 				"{																					\n"
 				"  mediump vec2 texSize;															\n"
 				"  if (nCurrentTile == 0)															\n"
@@ -2102,7 +2102,7 @@ public:
 		if (m_glinfo.isGLES2) {
 			shaderPart +=
 				"uniform mediump vec2 uTextureSize[2];										\n"
-				"lowp vec4 TextureNearest(in sampler2D tex, in highp vec2[5] tcData)		\n"
+				"lowp vec4 TextureNearest(in sampler2D tex, in highp vec2 tcData[5])		\n"
 				"{																					\n"
 				"  mediump vec2 texSize;															\n"
 				"  if (nCurrentTile == 0)															\n"
@@ -2114,7 +2114,7 @@ public:
 				;
 			if (g_textureConvert.useYUVCoversion())
 				shaderPart +=
-				"lowp vec4 YUV_Convert(in sampler2D tex, in highp vec2[5] tcData, in lowp int convert, in lowp int format, in lowp vec4 prev)	\n"
+				"lowp vec4 YUV_Convert(in sampler2D tex, in highp vec2 tcData[5], in lowp int convert, in lowp int format, in lowp vec4 prev)	\n"
 				"{																	\n"
 				"  lowp vec4 texColor;												\n"
 				"  if (convert != 0) texColor = prev;								\n"
@@ -2137,7 +2137,7 @@ public:
 						// 3 point texture filtering.
 						// Original author: ArthurCarvalho
 						// GLSL implementation: twinaphex, mupen64plus-libretro project.
-						"lowp vec4 TextureFilter(in sampler2D tex, in highp vec2[5] tcData)		\n"
+						"lowp vec4 TextureFilter(in sampler2D tex, in highp vec2 tcData[5])		\n"
 						"{																					\n"
 						"  mediump vec2 texSize;															\n"
 						"  if (nCurrentTile == 0)															\n"
@@ -2158,7 +2158,7 @@ public:
 					shaderPart +=
 						// bilinear filtering.
 						//"uniform mediump vec2 uTextureSize[2];										\n" NOT NEEDED HERE?
-						"lowp vec4 TextureFilter(in sampler2D tex, in highp vec2[5] tcData)		\n"
+						"lowp vec4 TextureFilter(in sampler2D tex, in highp vec2 tcData[5])		\n"
 						"{																					\n"
 						"  mediump vec2 texSize;															\n"
 						"  if (nCurrentTile == 0)															\n"
@@ -2176,7 +2176,7 @@ public:
 						;
 				}
 				shaderPart +=
-					"lowp vec4 readTex(in sampler2D tex, in highp vec2[5] tcData, in lowp int fbMonochrome, in lowp int fbFixedAlpha)	\n"
+					"lowp vec4 readTex(in sampler2D tex, in highp vec2 tcData[5], in lowp int fbMonochrome, in lowp int fbFixedAlpha)	\n"
 					"{																			\n"
 					"  lowp vec4 texColor;														\n"
 					"  if (uTextureFilterMode == 0) texColor = TextureNearest(tex, tcData);		\n"
@@ -2201,7 +2201,7 @@ public:
 					"  return texel / float(uMSAASamples);										\n"
 					"}																			\n"
 					"																			\n"
-					"lowp vec4 readTexMS(in lowp sampler2DMS mstex, in highp vec2[5] tcData, in lowp int fbMonochrome, in lowp int fbFixedAlpha)	\n"
+					"lowp vec4 readTexMS(in lowp sampler2DMS mstex, in highp vec2 tcData[5], in lowp int fbMonochrome, in lowp int fbFixedAlpha)	\n"
 					"{																			\n"
 					"  mediump ivec2 itexCoord;													\n"
 					"  if (fbMonochrome == 3) {													\n"
@@ -2239,7 +2239,7 @@ public:
 		if (_glinfo.isGLES2) {
 			m_part =
 				"uniform mediump vec2 uTextureSize[2];										\n"
-				"lowp vec4 TextureNearest(in sampler2D tex, in highp vec2[5] tcData)		\n"
+				"lowp vec4 TextureNearest(in sampler2D tex, in highp vec2 tcData[5])		\n"
 				"{																					\n"
 				"  mediump vec2 texSize;															\n"
 				"  if (nCurrentTile == 0)															\n"
@@ -2248,7 +2248,7 @@ public:
 				"    texSize = uTextureSize[1];														\n"
 				"  return texture2D(tex, (tcData[0] + 0.5) / texSize);								\n"
 				"  }																				\n"
-				"lowp vec4 readTex(in sampler2D tex, in highp vec2[5] tcData, in lowp int fbMonochrome, in lowp int fbFixedAlpha)	\n"
+				"lowp vec4 readTex(in sampler2D tex, in highp vec2 tcData[5], in lowp int fbMonochrome, in lowp int fbFixedAlpha)	\n"
 				"{																			\n"
 				"  lowp vec4 texColor = TextureNearest(tex, tcData);						\n"
 				"  if (fbMonochrome == 1) texColor = vec4(texColor.r);						\n"
@@ -2270,7 +2270,7 @@ public:
 					"  return texel / float(uMSAASamples);										\n"
 					"}																			\n"
 					"																			\n"
-					"lowp vec4 readTexMS(in lowp sampler2DMS mstex, in highp vec2[5] tcData, in lowp int fbMonochrome, in lowp int fbFixedAlpha)	\n"
+					"lowp vec4 readTexMS(in lowp sampler2DMS mstex, in highp vec2 tcData[5], in lowp int fbMonochrome, in lowp int fbFixedAlpha)	\n"
 					"{																			\n"
 					"  mediump ivec2 itexCoord;													\n"
 					"  if (fbMonochrome == 3) {													\n"
@@ -2438,9 +2438,8 @@ public:
 			"} \n"
 
 			"uniform mediump vec2 uTexSize0;		\n"
-			"highp vec2[5] textureEngine0(in highp vec2 texCoord) \n"
+			"void textureEngine0(in highp vec2 texCoord, out highp vec2 tcData[5]) \n"
 			"{  \n"
-			"  highp vec2[5] tcData; \n" // {tc00, tc01, tc10, tc11, frPart}
 			"  mediump vec2 intPart = floor(texCoord); \n"
 			"  highp vec2 tc00 = clampWrapMirror(intPart, uTexWrap0, uTexClamp0, uTexWrapEn0, uTexClampEn0, uTexMirrorEn0); \n"
 			"  highp vec2 tc11 = clampWrapMirror(intPart + vec2(1.0,1.0), uTexWrap0, uTexClamp0, uTexWrapEn0, uTexClampEn0, uTexMirrorEn0); \n"
@@ -2449,13 +2448,11 @@ public:
 			"  tcData[1] = vec2(tcData[0].s, tcData[3].t); \n"
 			"  tcData[2] = vec2(tcData[3].s, tcData[0].t); \n"
 			"  tcData[4] = texCoord - intPart; \n"
-			"  return tcData;"
 			"}  \n"
 
 			"uniform mediump vec2 uTexSize1;		\n"
-			"highp vec2[5] textureEngine1(in highp vec2 texCoord) \n"
+			"void textureEngine1(in highp vec2 texCoord, out highp vec2 tcData[5]) \n"
 			"{  \n"
-			"  highp vec2[5] tcData; \n" // {tc00, tc01, tc10, tc11, frPart}
 			"  mediump vec2 intPart = floor(texCoord); \n"
 			"  highp vec2 tc00 = clampWrapMirror(intPart, uTexWrap1, uTexClamp1, uTexWrapEn1, uTexClampEn1, uTexMirrorEn1); \n"
 			"  highp vec2 tc11 = clampWrapMirror(intPart + vec2(1.0,1.0), uTexWrap1, uTexClamp1, uTexWrapEn1, uTexClampEn1, uTexMirrorEn1); \n"
@@ -2464,7 +2461,6 @@ public:
 			"  tcData[1] = vec2(tcData[0].s, tcData[3].t); \n"
 			"  tcData[2] = vec2(tcData[3].s, tcData[0].t); \n"
 			"  tcData[4] = texCoord - intPart; \n"
-			"  return tcData;"
 			"}  \n"
 
 			;
@@ -2477,7 +2473,7 @@ public:
 	ShaderFragmentTextureEngineTex0(const opengl::GLInfo _glinfo)
 	{
 		m_part =
-			"tcData0 = textureEngine0(vTexCoord0); \n"
+			"textureEngine0(vTexCoord0, tcData0); \n"
 			;
 	}
 };
@@ -2487,7 +2483,7 @@ public:
 	ShaderFragmentTextureEngineTex1(const opengl::GLInfo _glinfo)
 	{
 		m_part =
-			"tcData1 = textureEngine1(vTexCoord1); \n"
+			"textureEngine1(vTexCoord1, tcData1); \n"
 			;
 	}
 };
