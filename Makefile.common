@@ -382,6 +382,8 @@ SOURCES_CXX   += \
 	$(VIDEODIR_GLIDEN64)/src/GLideNHQ/TxFilter.cpp \
 	$(VIDEODIR_GLIDEN64)/src/GLideNHQ/TxFilterExport.cpp \
 	$(VIDEODIR_GLIDEN64)/src/GLideNHQ/TxHiResCache.cpp \
+	$(VIDEODIR_GLIDEN64)/src/GLideNHQ/TxHiResLoader.cpp \
+	$(VIDEODIR_GLIDEN64)/src/GLideNHQ/TxHiResNoCache.cpp \
 	$(VIDEODIR_GLIDEN64)/src/GLideNHQ/TxImage.cpp \
 	$(VIDEODIR_GLIDEN64)/src/GLideNHQ/TxQuantize.cpp \
 	$(VIDEODIR_GLIDEN64)/src/GLideNHQ/TxReSample.cpp \
