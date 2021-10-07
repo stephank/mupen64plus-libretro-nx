@@ -55,7 +55,7 @@ u32 TextureFilterHandler::_getConfigOptions() const
 		options |= (DUMP_TEXCACHE | DUMP_HIRESTEXCACHE);
 	if (config.textureFilter.txHiresFullAlphaChannel)
 		options |= LET_TEXARTISTS_FLY;
-	if (config.hotkeys.keys[Config::HotKey::hkTexDump] != 0)
+	if (config.hotkeys.enabledKeys[Config::HotKey::hkTexDump] != 0)
 		options |= DUMP_TEX;
 	if (config.textureFilter.txDeposterize)
 		options |= DEPOSTERIZE;
@@ -63,6 +63,8 @@ u32 TextureFilterHandler::_getConfigOptions() const
 		options |= FILE_TEXCACHE;
 	if (config.textureFilter.txHiresTextureFileStorage)
 		options |= FILE_HIRESTEXCACHE;
+	if (config.textureFilter.txNoTextureFileStorage)
+		options |= FILE_NOTEXCACHE;
 	return options;
 }
 

@@ -17,6 +17,10 @@
 #include "GLSL/glsl_SpecialShadersFactory.h"
 #include "GLSL/glsl_ShaderStorage.h"
 
+#ifndef GL_EXT_texture_filter_anisotropic
+#define GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT 0x84FF
+#endif
+
 #ifdef OS_ANDROID
 #include <Graphics/OpenGLContext/GraphicBuffer/GraphicBufferWrapper.h>
 #endif
@@ -276,6 +280,18 @@ s32 ContextImpl::getMaxTextureSize() const
 	return maxTextureSize;
 }
 
+f32 ContextImpl::getMaxAnisotropy() const
+{
+	GLfloat maxInisotropy = 0.0f;
+
+	if (m_glInfo.anisotropic_filtering) {
+		glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &maxInisotropy);
+		return maxInisotropy;
+	} else {
+		return 0.0f;
+	}
+}
+
 void ContextImpl::bindImageTexture(const graphics::Context::BindImageTextureParameters & _params)
 {
 	glBindImageTexture(GLuint(_params.imageUnit), GLuint(_params.texture), 0, GL_FALSE, 0, GLenum(_params.accessMode), GLenum(_params.textureFormat));
@@ -518,8 +534,6 @@ bool ContextImpl::isSupported(graphics::SpecialFeatures _feature) const
 		return m_glInfo.depthTexture;
 	case graphics::SpecialFeatures::IntegerTextures:
 		return !m_glInfo.isGLES2;
-	case graphics::SpecialFeatures::ClipControl:
-		return !m_glInfo.isGLESX;
 	case graphics::SpecialFeatures::N64DepthWithFbFetchDepth:
 		return m_glInfo.n64DepthWithFbFetch;
 	case graphics::SpecialFeatures::FramebufferFetchColor:
