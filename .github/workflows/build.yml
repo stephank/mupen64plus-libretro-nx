@@ -1,0 +1,28 @@
+name: Build
+
+on:
+  push:
+    branches: [develop]
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/stephank/docker-lg-webos-ndk
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: ccache
+        uses: hendrikmuhs/ccache-action@v1
+        with:
+          key: webos
+          max-size: 1G
+      - name: Build
+        run: make -j$(nproc) FORCE_GLES3=1 HAVE_NEON=1
+      - name: Upload
+        uses: actions/upload-artifact@v2
+        with:
+          name: plugin
+          path: mupen64plus_next_libretro.so
+
